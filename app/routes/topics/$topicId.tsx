@@ -3,37 +3,39 @@ import { json, redirect } from "@remix-run/node";
 import { Form, useCatch, useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
 
-import { deleteNote, getNote } from "~/models/note.server";
+import { deleteTopic, getTopic } from "~/models/topic.server";
 import { requireUserId } from "~/session.server";
 
 export async function loader({ request, params }: LoaderArgs) {
   const userId = await requireUserId(request);
-  invariant(params.noteId, "noteId not found");
+  invariant(params.topicId, "topicId not found");
 
-  const note = await getNote({ userId, id: params.noteId });
-  if (!note) {
+  const topic = await getTopic({ userId, id: params.topicId });
+  if (!topic) {
     throw new Response("Not Found", { status: 404 });
   }
-  return json({ note });
+  return json({ topic });
 }
 
 export async function action({ request, params }: ActionArgs) {
   const userId = await requireUserId(request);
-  invariant(params.noteId, "noteId not found");
+  invariant(params.topicId, "topicId not found");
 
-  await deleteNote({ userId, id: params.noteId });
+  await deleteTopic({ userId, id: params.topicId });
 
-  return redirect("/notes");
+  return redirect("/topics");
 }
 
-export default function NoteDetailsPage() {
+export default function TopicDetailsPage() {
   const data = useLoaderData<typeof loader>();
 
   return (
     <div>
-      <h3 className="text-2xl font-bold">{data.note.title}</h3>
-      <p className="py-6">{data.note.body}</p>
+      <h3 className="text-2xl font-bold">{data.topic.title}</h3>
+      <p className="py-6">{data.topic.description}</p>
+
       <hr className="my-4" />
+
       <Form method="post">
         <button
           type="submit"
@@ -56,7 +58,7 @@ export function CatchBoundary() {
   const caught = useCatch();
 
   if (caught.status === 404) {
-    return <div>Note not found</div>;
+    return <div>Topic not found</div>;
   }
 
   throw new Error(`Unexpected caught response with status: ${caught.status}`);
