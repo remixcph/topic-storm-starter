@@ -1,15 +1,16 @@
 import React from "react";
-import { Link, useLoaderData, useSearchParams } from "@remix-run/react";
+import { useLoaderData, useSearchParams } from "@remix-run/react";
 import type { LoaderArgs } from "@remix-run/server-runtime";
 import { json } from "@remix-run/server-runtime";
 import type { Topic } from "@prisma/client";
 import { getTopicListItems } from "~/models/topic.server";
+import { TopicCard } from "~/components";
 
 export async function loader({ request }: LoaderArgs) {
   const url = new URL(request.url);
   const query = url.searchParams.get('query') || undefined;
   const topics = await getTopicListItems({ query });
-  return json({ topics });
+  return json({ topics: topics.map((topic) => ({...topic, likes: topic.likes.length})) });
 }
 
 export default function TopicIndexPage() {
@@ -41,11 +42,8 @@ export default function TopicIndexPage() {
         <>
           {topics.map((topic) => (
             // Todo refactor to Topic card component
-            <div key={topic.id} className="border-b">
-              <Link className={`} block p-4 text-xl`} to={topic.id}>
-                {topic.title}
-              </Link>
-              <p>{topic.description}</p>
+            <div key={topic.id}>
+              <TopicCard {...topic}/>
             </div>
           ))}
         </>
