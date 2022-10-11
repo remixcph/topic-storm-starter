@@ -1,19 +1,8 @@
-import type { LoaderArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { Form, Link, NavLink, Outlet, useLoaderData } from "@remix-run/react";
+import { Form, Link, Outlet } from "@remix-run/react";
 
-import { requireUserId } from "~/session.server";
 import { useUser } from "~/utils";
-import { getTopicListItems } from "~/models/topic.server";
-
-export async function loader({ request }: LoaderArgs) {
-  const userId = await requireUserId(request);
-  const topicListItems = await getTopicListItems({ userId });
-  return json({ topicListItems });
-}
 
 export default function TopicPage() {
-  const data = useLoaderData<typeof loader>();
   const user = useUser();
 
   return (
@@ -34,33 +23,6 @@ export default function TopicPage() {
       </header>
 
       <main className="flex h-full bg-white">
-        <div className="h-full w-80 border-r bg-gray-50">
-          <Link to="new" className="block p-4 text-xl text-blue-500">
-            + New Topic
-          </Link>
-
-          <hr />
-
-          {data.topicListItems.length === 0 ? (
-            <p className="p-4">No topics yet</p>
-          ) : (
-            <ol>
-              {data.topicListItems.map((topic) => (
-                <li key={topic.id}>
-                  <NavLink
-                    className={({ isActive }) =>
-                      `block border-b p-4 text-xl ${isActive ? "bg-white" : ""}`
-                    }
-                    to={topic.id}
-                  >
-                    📝 {topic.title}
-                  </NavLink>
-                </li>
-              ))}
-            </ol>
-          )}
-        </div>
-
         <div className="flex-1 p-6">
           <Outlet />
         </div>
