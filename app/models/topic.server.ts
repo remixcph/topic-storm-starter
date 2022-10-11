@@ -25,9 +25,10 @@ export function getTopic({
   });
 }
 
-export function getTopicListItems({ userId }: { userId: User["id"] }) {
+export function getTopicListItems({ query = '' }: { query?: string }) {
   return prisma.topic.findMany({
-    where: { userId },
+    where: {
+      OR: [{ title: { contains: query } }, { description: { contains: query } }]},
     select: { id: true, title: true, description: true },
     orderBy: { updatedAt: "desc" },
   });
