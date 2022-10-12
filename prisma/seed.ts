@@ -32,6 +32,14 @@ async function seed() {
     },
   });
 
+  await prisma.topic.create({
+    data: {
+      title: "My second topic",
+      description: "Hello, CPH!",
+      userId: user.id,
+    },
+  });
+
   await prisma.comment.create({
     data: {
       text: "My first comment",

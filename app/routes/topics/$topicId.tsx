@@ -1,20 +1,22 @@
 import type { ActionArgs, LoaderArgs } from "@remix-run/node";
-import { json, redirect } from "@remix-run/node";
-import { Form, useCatch, useLoaderData } from "@remix-run/react";
+import { redirect } from "@remix-run/node";
+import { Form, useCatch } from "@remix-run/react";
+import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import invariant from "tiny-invariant";
 
 import { deleteTopic, getTopic } from "~/models/topic.server";
 import { requireUserId } from "~/session.server";
 
 export async function loader({ request, params }: LoaderArgs) {
-  const userId = await requireUserId(request);
+  await requireUserId(request);
   invariant(params.topicId, "topicId not found");
 
-  const topic = await getTopic({ userId, id: params.topicId });
+  const topic = await getTopic({ id: params.topicId });
   if (!topic) {
     throw new Response("Not Found", { status: 404 });
   }
-  return json({ topic });
+
+  return typedjson({ topic });
 }
 
 export async function action({ request, params }: ActionArgs) {
@@ -27,19 +29,30 @@ export async function action({ request, params }: ActionArgs) {
 }
 
 export default function TopicDetailsPage() {
-  const data = useLoaderData<typeof loader>();
+  const { topic } = useTypedLoaderData<typeof loader>();
 
   return (
-    <div>
-      <h3 className="text-2xl font-bold">{data.topic.title}</h3>
-      <p className="py-6">{data.topic.description}</p>
+    <div className="rounded bg-yellow-100 p-2">
+      <h3 className="text-2xl font-bold">{topic.title}</h3>
+      <p>Created at: {topic.createdAt.toString()}</p>
+      <p>Updated at: {topic.updatedAt.toString()}</p>
+      <p className="py-6">{topic.description}</p>
 
+      <p>Likes: {topic.likes.length}</p>
+      <p>
+        Assignes:{" "}
+        {topic.assignees.length === 0 ? (
+          <p className="bg-red-400 py-6">No assignees yet</p>
+        ) : (
+          topic.assignees.map((assignee) => assignee.user.email).join(", ")
+        )}
+      </p>
       <hr className="my-4" />
 
       <Form method="post">
         <button
           type="submit"
-          className="rounded bg-blue-500  py-2 px-4 text-white hover:bg-blue-600 focus:bg-blue-400"
+          className="mt-4 rounded bg-blue-500 py-2 px-4 text-white hover:bg-blue-600 focus:bg-blue-400"
         >
           Delete
         </button>

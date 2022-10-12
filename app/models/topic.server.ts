@@ -1,36 +1,66 @@
-import type { User, Topic } from "@prisma/client";
+import type { User, Topic, Assignee, Like } from "@prisma/client";
 
 import { prisma } from "~/db.server";
 
 export type { Topic } from "@prisma/client";
 
-export function getTopic({
-  id,
-  userId,
-}: Pick<Topic, "id"> & {
-  userId: User["id"];
-}) {
-  return prisma.topic.findFirst({
-    select: {
-      id: true,
-      description: true,
-      title: true,
-      comments: {
-        select: { id: true, text: true, user: { select: { email: true } } },
+export type ExtendedTopic = Topic & {
+  assignees: (Assignee & { user: User })[];
+  comments: (Comment & { user: User })[];
+  likes: Like[];
+};
+
+export function getUsers({ userIDs }: { userIDs: string[] }) {
+  return prisma.user.findMany({
+    where: {
+      id: {
+        in: userIDs,
       },
-      likes: { select: { id: true } },
-      assignees: { select: { id: true, user: { select: { email: true } } } },
     },
-    where: { id, userId },
   });
 }
 
-export function getTopicListItems({ query = '' }: { query?: string }) {
+export function getTopic({ id }: Pick<Topic, "id">) {
+  return prisma.topic.findFirst({
+    include: {
+      likes: true,
+      assignees: {
+        include: {
+          user: true,
+        },
+      },
+      comments: {
+        include: {
+          user: true,
+        },
+      },
+    },
+    where: { id },
+  });
+}
+
+export function getTopicListItems({ query = "" }: { query?: string }) {
   return prisma.topic.findMany({
     where: {
-      OR: [{ title: { contains: query } }, { description: { contains: query } }]},
-    select: { id: true, title: true, description: true, likes: true },
-    orderBy: { updatedAt: "desc" },
+      OR: [
+        { title: { contains: query } },
+        { description: { contains: query } },
+      ],
+    },
+    include: {
+      assignees: {
+        include: {
+          user: true,
+        },
+      },
+      comments: {
+        include: {
+          user: true,
+        },
+      },
+      likes: true,
+    },
+    orderBy: { likes: { _count: "desc" } },
   });
 }
 

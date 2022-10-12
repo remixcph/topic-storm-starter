@@ -1,28 +1,20 @@
 import { useCallback, useMemo } from "react";
 import type { Like, Topic, User } from "@prisma/client";
 import { Link, useFetcher } from "@remix-run/react";
+import type { ExtendedTopic } from "~/models/topic.server";
 import { clsx } from "clsx";
 
 type TopicCardProps = {
-  id: Topic["id"];
-  title: Topic["title"];
-  description: Topic["description"];
-  likes?: Array<Like>;
+  topic: ExtendedTopic;
   userId: User["id"];
 };
 
-export const TopicCard = ({
-  id,
-  title,
-  description,
-  likes = [],
-  userId,
-}: TopicCardProps) => {
+export const TopicCard = ({ topic, userId }: TopicCardProps) => {
   const fetcher = useFetcher();
 
   const like = useMemo(
-    () => likes.find((like) => like.userId === userId),
-    [likes, userId]
+    () => topic.likes.find((like) => like.userId === userId),
+    [topic.likes, userId]
   );
 
   const handleCreateLike = useCallback(
@@ -44,39 +36,40 @@ export const TopicCard = ({
     },
     [fetcher]
   );
-
   return (
-    <div className="flex flex-col rounded-md p-4 shadow-md">
-      <Link className={`} block p-4 text-xl`} to={id}>
-        <h3 className="text-2xl font-bold">{title}</h3>
-
-        <p
-          className="my-6"
-          style={{
-            display: "-webkit-box",
-            WebkitLineClamp: 3,
-            WebkitBoxOrient: "vertical",
-            overflow: "hidden",
-          }}
-        >
-          {description}
-        </p>
+    <div className="flex flex-col rounded-md p-4 shadow-md hover:bg-white">
+      <Link className={`block text-xl`} to={topic.id}>
+        <h3 className="text-2xl font-bold hover:underline">{topic.title}</h3>
       </Link>
 
-      <div className="flex w-full items-center justify-end">
+      <p
+        className="my-6"
+        style={{
+          display: "-webkit-box",
+          WebkitLineClamp: 3,
+          WebkitBoxOrient: "vertical",
+          overflow: "hidden",
+        }}
+      >
+        {topic.description}
+      </p>
+
+      <div className="flex w-full items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <span>Likes: {likes.length}</span>
-          <button
-            className={clsx("rounded-md p-2 shadow-md", {
-              "opacity-50": like,
-            })}
-            onClick={() =>
-              like ? handleDeleteLike(like.id) : handleCreateLike(id)
-            }
-          >
-            {like ? "👎" : "👍"}
-          </button>
+          <span className="text-sm">💬 Comments: {topic.comments.length}</span>
+          <span>👍 Likes: {topic.likes.length}</span>
         </div>
+
+        <button
+          className={clsx("rounded-md p-2 shadow-md", {
+            "opacity-50": like,
+          })}
+          onClick={() =>
+            like ? handleDeleteLike(like.id) : handleCreateLike(topic.id)
+          }
+        >
+          {like ? "👎" : "👍"}
+        </button>
       </div>
     </div>
   );

@@ -1,24 +1,17 @@
 import React from "react";
-import {
-  useActionData,
-  useLoaderData,
-  useSearchParams,
-} from "@remix-run/react";
-import type { ActionArgs, LoaderArgs } from "@remix-run/server-runtime";
-import { redirect } from "@remix-run/server-runtime";
-import { json } from "@remix-run/server-runtime";
-import type { Topic, User } from "@prisma/client";
-import { createTopic, getTopicListItems } from "~/models/topic.server";
+import { useSearchParams } from "@remix-run/react";
+import type { LoaderArgs } from "@remix-run/server-runtime";
+import { getTopicListItems } from "~/models/topic.server";
 import { TopicCard } from "~/components";
 import { requireUserId } from "~/session.server";
-import { TopicForm } from "~/components/TopicForm";
+import { typedjson, useTypedLoaderData } from "remix-typedjson";
 
 export async function loader({ request }: LoaderArgs) {
+  const userId = await requireUserId(request);
   const url = new URL(request.url);
   const query = url.searchParams.get("query") || undefined;
   const topics = await getTopicListItems({ query });
-  const userId = await requireUserId(request);
-  return json({ topics, userId });
+  return typedjson({ topics, userId });
 }
 
 export async function action({ request }: ActionArgs) {
@@ -48,12 +41,8 @@ export async function action({ request }: ActionArgs) {
 }
 
 export default function TopicIndexPage() {
-  const { topics, userId } = useLoaderData<{
-    topics: Topic[];
-    userId: User["id"];
-  }>();
+  const { topics, userId } = useTypedLoaderData<typeof loader>();
   const [, setSearchParams] = useSearchParams();
-  const actionData = useActionData<typeof action>();
 
   const handleSearch = React.useCallback(
     (e: React.KeyboardEvent) => {
@@ -69,35 +58,27 @@ export default function TopicIndexPage() {
   );
 
   return (
-    <div className="h-full border-r bg-gray-50">
-      <TopicForm errors={actionData?.errors} />
-      <div className="m-4" />
-
+    <>
       <input
-        className="w-full flex-1 rounded-md border-2 border-blue-500 px-3 text-lg leading-loose"
+        className="mb-4 w-full flex-1 rounded-md border-2 border-blue-500 px-3 text-lg leading-loose"
         placeholder="Search for a topic"
         onKeyUp={(e) => handleSearch(e)}
       />
-      <hr />
 
-      {topics.length === 0 ? (
-        <p className="p-4">No topics yet</p>
-      ) : (
-        <>
-          {topics.map((topic) => {
-            const topicData = {
-              ...topic,
-              userId,
-            };
+      <div className="h-full flex-row rounded border-r bg-gray-50">
+        {/* // TODO: add new topic form */}
+        <hr />
 
-            return (
-              <div key={topic.id}>
-                <TopicCard {...topicData} />
-              </div>
-            );
-          })}
-        </>
-      )}
-    </div>
+        {topics.length === 0 ? (
+          <p className="p-4">No topics yet</p>
+        ) : (
+          <>
+            {topics.map((topic) => {
+              return <TopicCard key={topic.id} topic={topic} userId={userId} />;
+            })}
+          </>
+        )}
+      </div>
+    </>
   );
 }
