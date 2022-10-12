@@ -60,7 +60,7 @@ export function getTopicListItems({ query = "" }: { query?: string }) {
       },
       likes: true,
     },
-    orderBy: { likes: { _count: "desc" } },
+    // orderBy: { likes: { _count: "desc" } },
   });
 }
 

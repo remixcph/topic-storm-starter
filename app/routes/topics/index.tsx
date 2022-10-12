@@ -5,6 +5,7 @@ import { getTopicListItems } from "~/models/topic.server";
 import { TopicCard } from "~/components";
 import { requireUserId } from "~/session.server";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
+import { TopicForm } from "~/components/TopicForm";
 
 export async function loader({ request }: LoaderArgs) {
   const userId = await requireUserId(request);
@@ -12,32 +13,6 @@ export async function loader({ request }: LoaderArgs) {
   const query = url.searchParams.get("query") || undefined;
   const topics = await getTopicListItems({ query });
   return typedjson({ topics, userId });
-}
-
-export async function action({ request }: ActionArgs) {
-  const userId = await requireUserId(request);
-
-  const formData = await request.formData();
-  const title = formData.get("title");
-  const description = formData.get("description");
-
-  if (typeof title !== "string" || title.length === 0) {
-    return json(
-      { errors: { title: "Title is required", description: null } },
-      { status: 400 }
-    );
-  }
-
-  if (typeof description !== "string" || description.length === 0) {
-    return json(
-      { errors: { title: null, description: "description is required" } },
-      { status: 400 }
-    );
-  }
-
-  await createTopic({ title, description, userId });
-
-  return redirect(`/topics`);
 }
 
 export default function TopicIndexPage() {
@@ -58,27 +33,28 @@ export default function TopicIndexPage() {
   );
 
   return (
-    <>
+    <div className="flex flex-col gap-6">
+      <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 shadow-md">
+        <TopicForm redirectTo="/topics" />
+      </div>
+
       <input
-        className="mb-4 w-full flex-1 rounded-md border-2 border-blue-500 px-3 text-lg leading-loose"
+        className="w-full flex-1 rounded-lg border-2 border-slate-300 px-3 text-lg leading-loose"
         placeholder="Search for a topic"
         onKeyUp={(e) => handleSearch(e)}
       />
 
-      <div className="h-full flex-row rounded border-r bg-gray-50">
-        {/* // TODO: add new topic form */}
-        <hr />
+      <hr />
 
-        {topics.length === 0 ? (
-          <p className="p-4">No topics yet</p>
-        ) : (
-          <>
-            {topics.map((topic) => {
-              return <TopicCard key={topic.id} topic={topic} userId={userId} />;
-            })}
-          </>
-        )}
-      </div>
-    </>
+      {topics.length === 0 ? (
+        <p className="p-4">No topics yet</p>
+      ) : (
+        <>
+          {topics.map((topic) => {
+            return <TopicCard key={topic.id} topic={topic} userId={userId} />;
+          })}
+        </>
+      )}
+    </div>
   );
 }
