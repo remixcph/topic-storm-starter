@@ -1,11 +1,14 @@
 import type { ActionArgs, LoaderArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
-import { Form, useCatch } from "@remix-run/react";
+import { Form, useActionData, useCatch } from "@remix-run/react";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import invariant from "tiny-invariant";
 
 import { deleteTopic, getTopic } from "~/models/topic.server";
 import { requireUserId } from "~/session.server";
+import { Comment } from "~/components/Comment";
+import { CommentForm } from "~/components/CommentForm";
+import { createComment } from "~/models/comment.server";
 
 export async function loader({ request, params }: LoaderArgs) {
   await requireUserId(request);
@@ -16,20 +19,39 @@ export async function loader({ request, params }: LoaderArgs) {
     throw new Response("Not Found", { status: 404 });
   }
 
-  return typedjson({ topic });
+  return typedjson({ topic, isAuthor: topic.userId === userId });
 }
 
 export async function action({ request, params }: ActionArgs) {
   const userId = await requireUserId(request);
   invariant(params.topicId, "topicId not found");
 
-  await deleteTopic({ userId, id: params.topicId });
+  const formData = await request.formData();
+  const method = formData.get("_method");
+  if (method === "delete") {
+    const topicAuthorId = await requireUserId(request);
+    if (userId === topicAuthorId)
+      await deleteTopic({ userId, id: params.topicId });
+    else return new Response("Forbidden", { status: 403 });
+  }
+  if (method === "create_comment") {
+    const comment = formData.get("comment");
+    if (typeof comment === "string" && comment.length > 0) {
+      await createComment({ userId, topicId: params.topicId, text: comment });
+    } else {
+      return typedjson(
+        { errors: { comment: "cannot create empty comment" } },
+        { status: 400 }
+      );
+    }
+  }
 
-  return redirect("/topics");
+  return redirect(`/topics/${params.topicId}`);
 }
 
 export default function TopicDetailsPage() {
-  const { topic } = useTypedLoaderData<typeof loader>();
+  const { topic, isAuthor } = useTypedLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
 
   return (
     <div className="rounded bg-yellow-100 p-2">
@@ -48,15 +70,29 @@ export default function TopicDetailsPage() {
         )}
       </p>
       <hr className="my-4" />
-
-      <Form method="post">
-        <button
-          type="submit"
-          className="mt-4 rounded bg-blue-500 py-2 px-4 text-white hover:bg-blue-600 focus:bg-blue-400"
-        >
-          Delete
-        </button>
-      </Form>
+      {isAuthor ? (
+        <Form method="post">
+          <button
+            type="submit"
+            className="mt-4 rounded bg-blue-500 py-2 px-4 text-white hover:bg-blue-600 focus:bg-blue-400"
+          >
+            Delete
+          </button>
+        </Form>
+      ) : null}
+      <hr className="my-4" />
+      <div>
+        {topic.comments.length === 0 ? <p>No comments yet</p> : null}
+        {topic.comments.map((comment) => (
+          <Comment
+            key={comment.id}
+            author={comment.user.email}
+            content={comment.text}
+          />
+        ))}
+      </div>
+      <hr className="my-4" />
+      <CommentForm error={actionData?.errors.comment} />
     </div>
   );
 }
