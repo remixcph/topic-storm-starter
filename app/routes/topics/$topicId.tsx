@@ -11,7 +11,7 @@ import { CommentForm } from "~/components/CommentForm";
 import { createComment } from "~/models/comment.server";
 
 export async function loader({ request, params }: LoaderArgs) {
-  await requireUserId(request);
+  const userId = await requireUserId(request);
   invariant(params.topicId, "topicId not found");
 
   const topic = await getTopic({ id: params.topicId });
