@@ -38,6 +38,12 @@ export function getTopic({ id }: Pick<Topic, "id">) {
     where: { id },
   });
 }
+export function getTopicAuthor({ id }: Pick<Topic, "id">) {
+  return prisma.topic.findFirst({
+    select: { user: { select: { email: true, id: true } } },
+    where: { id },
+  });
+}
 
 export function getTopicListItems({ query = "" }: { query?: string }) {
   return prisma.topic.findMany({
