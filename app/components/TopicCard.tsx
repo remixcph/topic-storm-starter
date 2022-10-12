@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from "react";
 import type { Like, Topic, User } from "@prisma/client";
 import { Link, useFetcher } from "@remix-run/react";
+import type { ExtendedTopic } from "~/models/topic.server";
 import { clsx } from "clsx";
 
 type TopicCardProps = {
@@ -10,6 +11,11 @@ type TopicCardProps = {
 
 export const TopicCard = ({ topic, userId }: TopicCardProps) => {
   const fetcher = useFetcher();
+
+  const like = useMemo(
+    () => topic.likes.find((like) => like.userId === userId),
+    [topic.likes, userId]
+  );
 
   const handleCreateLike = useCallback(
     (id: Topic["id"]) => {
@@ -21,6 +27,15 @@ export const TopicCard = ({ topic, userId }: TopicCardProps) => {
     [fetcher]
   );
 
+  const handleDeleteLike = useCallback(
+    (id: Like["id"]) => {
+      fetcher.submit(
+        { like_id: id },
+        { action: "action/delete-like", method: "post" }
+      );
+    },
+    [fetcher]
+  );
   return (
     <div className="flex flex-col rounded-md p-4 shadow-md hover:bg-white">
       <Link className={`block text-xl`} to={topic.id}>
@@ -39,23 +54,22 @@ export const TopicCard = ({ topic, userId }: TopicCardProps) => {
         {topic.description}
       </p>
 
-      <div className="flex w-full items-center justify-between">
-        <span className="text-sm">
-          Assignee:{" "}
-          {topic.assignees.map((assignee) => assignee.user.email).join(", ")}
-        </span>
+      <div className="flex w-full items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <span>Likes: {topic.likes.length}</span>
-          <button
-            className={`rounded-md p-2 shadow-md ${
-              topic.likes.some((like) => like.userId === userId) && "opacity-50"
-            }`}
-            onClick={() => handleCreateLike(topic.id)}
-            disabled={topic.likes.some((like) => like.userId === userId)}
-          >
-            👍
-          </button>
+          <span className="text-sm">💬 Comments: {topic.comments.length}</span>
+          <span>👍 Likes: {topic.likes.length}</span>
         </div>
+
+        <button
+          className={clsx("rounded-md p-2 shadow-md", {
+            "opacity-50": like,
+          })}
+          onClick={() =>
+            like ? handleDeleteLike(like.id) : handleCreateLike(topic.id)
+          }
+        >
+          {like ? "👎" : "👍"}
+        </button>
       </div>
     </div>
   );

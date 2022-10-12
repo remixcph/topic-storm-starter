@@ -6,6 +6,7 @@ export type { Topic } from "@prisma/client";
 
 export type ExtendedTopic = Topic & {
   assignees: (Assignee & { user: User })[];
+  comments: (Comment & { user: User })[];
   likes: Like[];
 };
 
@@ -48,6 +49,11 @@ export function getTopicListItems({ query = "" }: { query?: string }) {
     },
     include: {
       assignees: {
+        include: {
+          user: true,
+        },
+      },
+      comments: {
         include: {
           user: true,
         },
