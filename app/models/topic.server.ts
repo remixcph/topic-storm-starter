@@ -29,7 +29,7 @@ export function getTopicListItems({ query = '' }: { query?: string }) {
   return prisma.topic.findMany({
     where: {
       OR: [{ title: { contains: query } }, { description: { contains: query } }]},
-    select: { id: true, title: true, description: true },
+    select: { id: true, title: true, description: true, likes: true },
     orderBy: { updatedAt: "desc" },
   });
 }
