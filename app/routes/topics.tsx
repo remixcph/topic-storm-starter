@@ -9,10 +9,15 @@ export default function TopicPage() {
     <div className="flex h-full min-h-screen flex-col">
       <header className="flex items-center justify-between bg-slate-800 p-4 text-white">
         <h1 className="text-3xl font-bold">
-          <Link to=".">Topics</Link>
+          <Link to=".">Remix CPH Meetup Topics</Link>
         </h1>
-        <p>{user.email}</p>
-        <Form action="/logout" method="post">
+
+        <Form
+          action="/logout"
+          method="post"
+          className="flex items-center gap-4"
+        >
+          <p>{user.email}</p>
           <button
             type="submit"
             className="rounded bg-slate-600 py-2 px-4 text-blue-100 hover:bg-blue-500 active:bg-blue-600"
@@ -22,10 +27,8 @@ export default function TopicPage() {
         </Form>
       </header>
 
-      <main className="flex h-full bg-white">
-        <div className="flex-1 p-6">
-          <Outlet />
-        </div>
+      <main className="flex h-full flex-col overflow-auto bg-white p-6">
+        <Outlet />
       </main>
     </div>
   );

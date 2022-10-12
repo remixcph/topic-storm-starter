@@ -1,49 +1,57 @@
-import { Form } from "@remix-run/react";
-import React from "react";
+import { Form, useActionData, useTransition } from "@remix-run/react";
+import React, { useEffect } from "react";
+import type { action } from "~/routes/topics/new";
 
-type TopicFormProps = {
-  errors?: {
-    title?: string | null;
-    description?: string | null;
-  };
-};
-
-export function TopicForm({ errors }: TopicFormProps) {
+export function TopicForm({ redirectTo }: { redirectTo?: string }) {
+  const actionData = useActionData<typeof action>();
+  const formRef = React.useRef<HTMLFormElement>(null);
   const titleRef = React.useRef<HTMLInputElement>(null);
   const descriptionRef = React.useRef<HTMLTextAreaElement>(null);
+  const transition = useTransition();
 
-  React.useEffect(() => {
-    if (errors?.title) {
+  const isAdding = transition.state === "submitting";
+
+  useEffect(() => {
+    if (!isAdding) {
+      formRef.current?.reset();
+    }
+  }, [isAdding]);
+
+  useEffect(() => {
+    if (actionData?.errors?.title) {
       titleRef.current?.focus();
-    } else if (errors?.description) {
+    } else if (actionData?.errors?.description) {
       descriptionRef.current?.focus();
     }
-  }, [errors?.title, errors?.description]);
+  }, [actionData]);
 
   return (
     <Form
+      ref={formRef}
       method="post"
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 8,
-        width: "100%",
-      }}
+      action="/topics/new"
+      className="flex w-full flex-col gap-6"
     >
+      <input hidden name="redirect_to" defaultValue={redirectTo} />
+
+      <h3 className="text-xl font-bold">Add new topic</h3>
+
       <div>
         <label className="flex w-full flex-col gap-1">
           <span>Topic title: </span>
           <input
             ref={titleRef}
             name="title"
-            className="flex-1 rounded-md border-2 border-blue-500 px-3 text-lg leading-loose"
-            aria-invalid={errors?.title ? true : undefined}
-            aria-errormessage={errors?.title ? "title-error" : undefined}
+            className="flex-1 rounded-lg border-2 border-slate-300 px-3 text-lg leading-loose"
+            aria-invalid={actionData?.errors?.title ? true : undefined}
+            aria-errormessage={
+              actionData?.errors?.title ? "title-error" : undefined
+            }
           />
         </label>
-        {errors?.title && (
+        {actionData?.errors?.title && (
           <div className="pt-1 text-red-700" id="title-error">
-            {errors.title}
+            {actionData?.errors.title}
           </div>
         )}
       </div>
@@ -54,17 +62,17 @@ export function TopicForm({ errors }: TopicFormProps) {
           <textarea
             ref={descriptionRef}
             name="description"
-            rows={8}
-            className="w-full flex-1 rounded-md border-2 border-blue-500 py-2 px-3 text-lg leading-6"
-            aria-invalid={errors?.description ? true : undefined}
+            rows={4}
+            className="w-full flex-1 rounded-lg border-2 border-slate-300 py-2 px-3 text-lg leading-6"
+            aria-invalid={actionData?.errors?.description ? true : undefined}
             aria-errormessage={
-              errors?.description ? "description-error" : undefined
+              actionData?.errors?.description ? "description-error" : undefined
             }
           />
         </label>
-        {errors?.description && (
+        {actionData?.errors?.description && (
           <div className="pt-1 text-red-700" id="description-error">
-            {errors.description}
+            {actionData?.errors.description}
           </div>
         )}
       </div>

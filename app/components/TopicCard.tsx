@@ -37,22 +37,22 @@ export const TopicCard = ({ topic, userId }: TopicCardProps) => {
     [fetcher]
   );
   return (
-    <div className="flex flex-col rounded-md p-4 shadow-md hover:bg-white">
-      <Link className={`block text-xl`} to={topic.id}>
-        <h3 className="text-2xl font-bold hover:underline">{topic.title}</h3>
-      </Link>
+    <div className="flex flex-col rounded-lg border border-slate-200 p-4 shadow-md hover:bg-slate-50">
+      <Link className="block p-4 text-xl" to={topic.id}>
+        <h3 className="text-2xl font-bold">{topic.title}</h3>
 
-      <p
-        className="my-6"
-        style={{
-          display: "-webkit-box",
-          WebkitLineClamp: 3,
-          WebkitBoxOrient: "vertical",
-          overflow: "hidden",
-        }}
-      >
-        {topic.description}
-      </p>
+        <p
+          className="my-6"
+          style={{
+            display: "-webkit-box",
+            WebkitLineClamp: 3,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+          }}
+        >
+          {topic.description}
+        </p>
+      </Link>
 
       <div className="flex w-full items-center justify-between gap-4">
         <div className="flex items-center gap-4">
@@ -61,7 +61,7 @@ export const TopicCard = ({ topic, userId }: TopicCardProps) => {
         </div>
 
         <button
-          className={clsx("rounded-md p-2 shadow-md", {
+          className={clsx("rounded-md p-2 shadow-md hover:bg-yellow-100", {
             "opacity-50": like,
           })}
           onClick={() =>
