@@ -54,32 +54,33 @@ export default function TopicDetailsPage() {
   const actionData = useActionData<typeof action>();
 
   return (
-    <div className="rounded bg-yellow-100 p-2">
-      <h3 className="text-2xl font-bold">{topic.title}</h3>
-      <p>Created at: {topic.createdAt.toString()}</p>
-      <p>Updated at: {topic.updatedAt.toString()}</p>
-      <p className="py-6">{topic.description}</p>
+    <div>
+      <div className="rounded bg-yellow-100 p-2">
+        <h3 className="text-2xl font-bold">{topic.title}</h3>
+        <p>Created at: {topic.createdAt.toString()}</p>
+        <p>Updated at: {topic.updatedAt.toString()}</p>
+        <p className="py-6">{topic.description}</p>
 
-      <p>Likes: {topic.likes.length}</p>
-      <p>
-        Assignes:{" "}
-        {topic.assignees.length === 0 ? (
-          <p className="bg-red-400 py-6">No assignees yet</p>
-        ) : (
-          topic.assignees.map((assignee) => assignee.user.email).join(", ")
-        )}
-      </p>
-      <hr className="my-4" />
-      {isAuthor ? (
-        <Form method="post">
-          <button
-            type="submit"
-            className="mt-4 rounded bg-blue-500 py-2 px-4 text-white hover:bg-blue-600 focus:bg-blue-400"
-          >
-            Delete
-          </button>
-        </Form>
-      ) : null}
+        <p>Likes: {topic.likes.length}</p>
+        <p>
+          Assignes:{" "}
+          {topic.assignees.length === 0 ? (
+            <p className="bg-red-400 py-6">No assignees yet</p>
+          ) : (
+            topic.assignees.map((assignee) => assignee.user.email).join(", ")
+          )}
+        </p>
+        {isAuthor ? (
+          <Form method="post">
+            <button
+              type="submit"
+              className="mt-4 rounded bg-blue-500 py-2 px-4 text-white hover:bg-blue-600 focus:bg-blue-400"
+            >
+              Delete
+            </button>
+          </Form>
+        ) : null}
+      </div>
       <hr className="my-4" />
       <div>
         {topic.comments.length === 0 ? <p>No comments yet</p> : null}
