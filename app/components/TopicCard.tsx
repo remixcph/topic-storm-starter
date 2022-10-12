@@ -58,6 +58,7 @@ export const TopicCard = ({ topic, userId }: TopicCardProps) => {
         <div className="flex items-center gap-4">
           <span className="text-sm">💬 Comments: {topic.comments.length}</span>
           <span>👍 Likes: {topic.likes.length}</span>
+          <span>🙋‍♂️ 🙋‍♀️ Assignees: {topic.assignees.length}</span>
         </div>
 
         <button
