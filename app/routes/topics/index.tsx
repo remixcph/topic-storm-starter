@@ -2,19 +2,21 @@ import React from "react";
 import { useLoaderData, useSearchParams } from "@remix-run/react";
 import type { LoaderArgs } from "@remix-run/server-runtime";
 import { json } from "@remix-run/server-runtime";
-import type { Topic } from "@prisma/client";
+import type { Topic, User } from "@prisma/client";
 import { getTopicListItems } from "~/models/topic.server";
 import { TopicCard } from "~/components";
+import { requireUserId } from "~/session.server";
 
 export async function loader({ request }: LoaderArgs) {
   const url = new URL(request.url);
   const query = url.searchParams.get('query') || undefined;
   const topics = await getTopicListItems({ query });
-  return json({ topics: topics.map((topic) => ({...topic, likes: topic.likes.length})) });
+  const userId = await requireUserId(request);
+  return json({ topics, userId });
 }
 
 export default function TopicIndexPage() {
-  const { topics } = useLoaderData<{ topics: Topic[] }>();
+  const { topics, userId } = useLoaderData<{ topics: Topic[], userId: User["id"] }>();
   const [ , setSearchParams] = useSearchParams();
 
   const handleSearch = React.useCallback((e: React.KeyboardEvent) => {
@@ -25,6 +27,7 @@ export default function TopicIndexPage() {
     } else {
       setSearchParams({ query: target.value })}
     }, [setSearchParams])
+
 
   return (
     <div className="h-full border-r bg-gray-50">
@@ -40,12 +43,17 @@ export default function TopicIndexPage() {
         <p className="p-4">No topics yet</p>
       ) : (
         <>
-          {topics.map((topic) => (
-            // Todo refactor to Topic card component
+          {topics.map((topic) => {
+            const topicData = {
+              ...topic,
+              userId
+            };
+
+            return (
             <div key={topic.id}>
-              <TopicCard {...topic}/>
+              <TopicCard {...topicData}/>
             </div>
-          ))}
+          )})}
         </>
       )}
     </div>
