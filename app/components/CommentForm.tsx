@@ -24,7 +24,7 @@ export function CommentForm({
           <input name="_method" type="hidden" value="create_comment" />
           <textarea
             name="comment"
-            rows={8}
+            rows={4}
             className="w-full flex-1 rounded-md border-2 border-slate-300 py-2 px-3 text-lg leading-6"
             aria-invalid={error ? true : undefined}
             aria-errormessage={error ? "commnet-error" : undefined}
