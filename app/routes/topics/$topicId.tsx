@@ -87,7 +87,7 @@ export default function TopicDetailsPage() {
         ) : null}
       </div>
       <hr className="my-4" />
-      <div>
+      <div className="flex flex-col gap-4">
         {topic.comments.length === 0 ? <p>No comments yet</p> : null}
         {topic.comments.map((comment) => (
           <Comment
