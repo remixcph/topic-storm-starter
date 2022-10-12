@@ -49,15 +49,6 @@ export default function TopicDetailsPage() {
       </p>
       <hr className="my-4" />
 
-      <div className="bg-yellow-200 font-bold">Comments</div>
-      {topic.comments.map((comment) => (
-        <div key={comment.id} className="border border-black bg-yellow-200 p-2">
-          <div>{comment.text}</div>
-          <div>{comment.createdAt.toString()}</div>
-          <div>By: {comment.user.email}</div>
-        </div>
-      ))}
-
       <Form method="post">
         <button
           type="submit"
