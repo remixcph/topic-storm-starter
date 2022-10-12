@@ -4,26 +4,12 @@ import { Link, useFetcher } from "@remix-run/react";
 import { clsx } from "clsx";
 
 type TopicCardProps = {
-  id: Topic["id"];
-  title: Topic["title"];
-  description: Topic["description"];
-  likes?: Array<Like>;
+  topic: ExtendedTopic;
   userId: User["id"];
 };
 
-export const TopicCard = ({
-  id,
-  title,
-  description,
-  likes = [],
-  userId,
-}: TopicCardProps) => {
+export const TopicCard = ({ topic, userId }: TopicCardProps) => {
   const fetcher = useFetcher();
-
-  const like = useMemo(
-    () => likes.find((like) => like.userId === userId),
-    [likes, userId]
-  );
 
   const handleCreateLike = useCallback(
     (id: Topic["id"]) => {
@@ -35,46 +21,39 @@ export const TopicCard = ({
     [fetcher]
   );
 
-  const handleDeleteLike = useCallback(
-    (id: Like["id"]) => {
-      fetcher.submit(
-        { like_id: id },
-        { action: "action/delete-like", method: "post" }
-      );
-    },
-    [fetcher]
-  );
-
   return (
-    <div className="flex flex-col rounded-md p-4 shadow-md">
-      <Link className={`} block p-4 text-xl`} to={id}>
-        <h3 className="text-2xl font-bold">{title}</h3>
-
-        <p
-          className="my-6"
-          style={{
-            display: "-webkit-box",
-            WebkitLineClamp: 3,
-            WebkitBoxOrient: "vertical",
-            overflow: "hidden",
-          }}
-        >
-          {description}
-        </p>
+    <div className="flex flex-col rounded-md p-4 shadow-md hover:bg-white">
+      <Link className={`block text-xl`} to={topic.id}>
+        <h3 className="text-2xl font-bold hover:underline">{topic.title}</h3>
       </Link>
 
-      <div className="flex w-full items-center justify-end">
+      <p
+        className="my-6"
+        style={{
+          display: "-webkit-box",
+          WebkitLineClamp: 3,
+          WebkitBoxOrient: "vertical",
+          overflow: "hidden",
+        }}
+      >
+        {topic.description}
+      </p>
+
+      <div className="flex w-full items-center justify-between">
+        <span className="text-sm">
+          Assignee:{" "}
+          {topic.assignees.map((assignee) => assignee.user.email).join(", ")}
+        </span>
         <div className="flex items-center gap-4">
-          <span>Likes: {likes.length}</span>
+          <span>Likes: {topic.likes.length}</span>
           <button
-            className={clsx("rounded-md p-2 shadow-md", {
-              "opacity-50": like,
-            })}
-            onClick={() =>
-              like ? handleDeleteLike(like.id) : handleCreateLike(id)
-            }
+            className={`rounded-md p-2 shadow-md ${
+              topic.likes.some((like) => like.userId === userId) && "opacity-50"
+            }`}
+            onClick={() => handleCreateLike(topic.id)}
+            disabled={topic.likes.some((like) => like.userId === userId)}
           >
-            {like ? "👎" : "👍"}
+            👍
           </button>
         </div>
       </div>
