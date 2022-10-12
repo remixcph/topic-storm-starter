@@ -1,24 +1,38 @@
-import type { Topic } from "@prisma/client";
-import { Link, useLoaderData } from "@remix-run/react";
+import React from "react";
+import { Link, useLoaderData, useSearchParams } from "@remix-run/react";
 import type { LoaderArgs } from "@remix-run/server-runtime";
 import { json } from "@remix-run/server-runtime";
+import type { Topic } from "@prisma/client";
 import { getTopicListItems } from "~/models/topic.server";
-import { requireUserId } from "~/session.server";
 
 export async function loader({ request }: LoaderArgs) {
-  const userId = await requireUserId(request);
-  const topics = await getTopicListItems({ userId });
+  const url = new URL(request.url);
+  const query = url.searchParams.get('query') || undefined;
+  const topics = await getTopicListItems({ query });
   return json({ topics });
 }
 
 export default function TopicIndexPage() {
   const { topics } = useLoaderData<{ topics: Topic[] }>();
-  console.log(topics);
+  const [ , setSearchParams] = useSearchParams();
+
+  const handleSearch = React.useCallback((e: React.KeyboardEvent) => {
+    const target = e.target as HTMLInputElement;
+
+    if (target.value === '') {
+      setSearchParams({})
+    } else {
+      setSearchParams({ query: target.value })}
+    }, [setSearchParams])
 
   return (
     <div className="h-full border-r bg-gray-50">
       {/* // TODO: add new topic form */}
-      {/* // TODO: add topic search */}
+      <input 
+        className="flex-1 rounded-md border-2 border-blue-500 px-3 text-lg leading-loose w-full" 
+        placeholder="Search for a topic" 
+        onKeyUp={(e) => handleSearch(e)} 
+      />
       <hr />
 
       {topics.length === 0 ? (
