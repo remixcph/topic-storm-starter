@@ -1,6 +1,6 @@
 import type { ActionArgs, LoaderArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
-import { Form, useActionData, useCatch } from "@remix-run/react";
+import { Form, useActionData, useCatch, useTransition } from "@remix-run/react";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
 import invariant from "tiny-invariant";
 
@@ -53,6 +53,11 @@ export default function TopicDetailsPage() {
   const { topic, isAuthor } = useTypedLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
+  const transition = useTransition();
+  const isAdding =
+    transition.state === "submitting" &&
+    transition.submission.formData.get("_method") === "create_comment";
+
   return (
     <div>
       <div className="rounded bg-yellow-100 p-2">
@@ -93,7 +98,7 @@ export default function TopicDetailsPage() {
         ))}
       </div>
       <hr className="my-4" />
-      <CommentForm error={actionData?.errors.comment} />
+      <CommentForm error={actionData?.errors.comment} isAdding={isAdding} />
     </div>
   );
 }

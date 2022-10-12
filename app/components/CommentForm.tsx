@@ -1,8 +1,24 @@
 import { Form } from "@remix-run/react";
+import React, { useEffect } from "react";
 
-export function CommentForm({ error }: { error?: string }) {
+export function CommentForm({
+  error,
+  isAdding,
+}: {
+  error?: string;
+  isAdding: boolean;
+}) {
+  const formRef = React.useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    if (!isAdding) {
+      formRef.current?.reset();
+    }
+  }, [isAdding]);
+
   return (
     <Form
+      ref={formRef}
       method="post"
       style={{
         display: "flex",
@@ -35,7 +51,7 @@ export function CommentForm({ error }: { error?: string }) {
           type="submit"
           className="rounded bg-blue-500 py-2 px-4 text-white hover:bg-blue-600 focus:bg-blue-400"
         >
-          Add Topic
+          Add Comment
         </button>
       </div>
     </Form>
