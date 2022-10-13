@@ -55,8 +55,18 @@ export function getTopicListItems({
   return prisma.topic.findMany({
     where: {
       OR: [
-        { title: { contains: query } },
-        { description: { contains: query } },
+        {
+          title: {
+            contains: query,
+            mode: "insensitive",
+          },
+        },
+        {
+          description: {
+            contains: query,
+            mode: "insensitive",
+          },
+        },
       ],
     },
     include: {
