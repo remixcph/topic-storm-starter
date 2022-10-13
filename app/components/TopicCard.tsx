@@ -10,7 +10,7 @@ type TopicCardProps = {
 };
 
 export const TopicCard = ({ topic, userId }: TopicCardProps) => {
-  const fetcher = useFetcher();
+  // const fetcher = useFetcher(); // uncomment to use fetcher
 
   const like = useMemo(
     () => topic.likes.find((like) => like.userId === userId),
@@ -19,22 +19,16 @@ export const TopicCard = ({ topic, userId }: TopicCardProps) => {
 
   const handleCreateLike = useCallback(
     (id: Topic["id"]) => {
-      fetcher.submit(
-        { topic_id: id },
-        { action: "action/create-like", method: "post" }
-      );
+      // TODO: use fetcher to create like, call action: action/create-like
     },
-    [fetcher]
+    []
   );
 
   const handleDeleteLike = useCallback(
     (id: Like["id"]) => {
-      fetcher.submit(
-        { like_id: id },
-        { action: "action/delete-like", method: "post" }
-      );
+      // TODO: use fetcher to delete like, call action: action/delete-like
     },
-    [fetcher]
+    []
   );
   return (
     <div className="flex flex-col rounded-lg border border-slate-200 p-4 shadow-md hover:bg-slate-50">
