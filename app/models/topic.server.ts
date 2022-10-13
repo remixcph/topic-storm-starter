@@ -1,4 +1,4 @@
-import type { User, Topic, Assignee, Like } from "@prisma/client";
+import type { User, Topic, Assignee, Like, Comment } from "@prisma/client";
 
 import { prisma } from "~/db.server";
 
@@ -66,7 +66,9 @@ export function getTopicListItems({ query = "" }: { query?: string }) {
       },
       likes: true,
     },
-    // orderBy: { likes: { _count: "desc" } },
+    orderBy: {
+      createdAt: "desc",
+    }
   });
 }
 
