@@ -14,7 +14,6 @@ export async function loader({ request }: LoaderArgs) {
   const query = url.searchParams.get("query") || undefined;
   const sortBy = url.searchParams.get("sort-topics") || undefined;
 
-
   const topics = await getTopicListItems({ query, sortBy });
   return typedjson({ topics, userId });
 }
@@ -41,8 +40,6 @@ export default function TopicIndexPage() {
       <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 shadow-md">
         <TopicForm redirectTo="/topics" />
       </div>
-
-  
 
       <input
         className="w-full flex-1 rounded-lg border-2 border-slate-300 px-3 text-lg leading-loose"
