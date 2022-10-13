@@ -1,4 +1,4 @@
-import type { User, Topic, Assignee, Like } from "@prisma/client";
+import type { User, Topic, Assignee, Like, Comment } from "@prisma/client";
 
 import { prisma } from "~/db.server";
 
@@ -45,7 +45,13 @@ export function getTopicAuthor({ id }: Pick<Topic, "id">) {
   });
 }
 
-export function getTopicListItems({ query = "" }: { query?: string }) {
+export function getTopicListItems({
+  query = "",
+  sortBy = "newest",
+}: {
+  query?: string;
+  sortBy?: string;
+}) {
   return prisma.topic.findMany({
     where: {
       OR: [
@@ -66,7 +72,12 @@ export function getTopicListItems({ query = "" }: { query?: string }) {
       },
       likes: true,
     },
-    // orderBy: { likes: { _count: "desc" } },
+    orderBy:
+      sortBy === "oldest"
+        ? { createdAt: "asc" }
+        : sortBy === "most-liked"
+        ? { likes: { _count: "desc" } }
+        : { createdAt: "desc" },
   });
 }
 
