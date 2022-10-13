@@ -47,9 +47,7 @@ export default function TopicIndexPage() {
         onKeyUp={(e) => handleSearch(e)}
       />
 
-      <div>
-        <TopicSorter />
-      </div>
+      
 
       <hr />
 
