@@ -1,115 +1,39 @@
-import type { Assignee } from "@prisma/client";
 import type { ActionArgs, LoaderArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
-import {
-  Form,
-  useActionData,
-  useCatch,
-  useFetcher,
-  useTransition,
-} from "@remix-run/react";
+import { Form, useCatch } from "@remix-run/react";
 import clsx from "clsx";
 import { useCallback, useMemo } from "react";
 import { typedjson, useTypedLoaderData } from "remix-typedjson";
-import invariant from "tiny-invariant";
-
-import { Comment } from "~/components/Comment";
-import { CommentForm } from "~/components/CommentForm";
-import { createComment } from "~/models/comment.server";
-import type { Topic } from "~/models/topic.server";
-import { deleteTopic, getTopic } from "~/models/topic.server";
-import { requireUserId } from "~/session.server";
 
 export async function loader({ request, params }: LoaderArgs) {
-  const userId = await requireUserId(request);
-  invariant(params.topicId, "topicId not found");
-
-  const topic = await getTopic({ id: params.topicId });
-  if (!topic) {
-    throw new Response("Not Found", { status: 404 });
-  }
-
-  return typedjson({ topic, isAuthor: topic.userId === userId, userId });
+  // TODO: implement loader function
+  return typedjson({});
 }
 
 export async function action({ request, params }: ActionArgs) {
-  const userId = await requireUserId(request);
-  invariant(params.topicId, "topicId not found");
-
-  const formData = await request.formData();
-  const method = formData.get("_method");
-  if (method === "delete") {
-    const topicAuthorId = await requireUserId(request);
-    if (userId === topicAuthorId)
-      await deleteTopic({ userId, id: params.topicId });
-    else return new Response("Forbidden", { status: 403 });
-  }
-  if (method === "create_comment") {
-    const comment = formData.get("comment");
-    if (typeof comment === "string" && comment.length > 0) {
-      await createComment({ userId, topicId: params.topicId, text: comment });
-    } else {
-      return typedjson(
-        { errors: { comment: "cannot create empty comment" } },
-        { status: 400 }
-      );
-    }
-  }
-
+  // TODO: implement action function
   return redirect(`/topics`);
 }
 
 export default function TopicDetailsPage() {
-  const { topic, isAuthor, userId } = useTypedLoaderData<typeof loader>();
-  const fetcher = useFetcher();
-  const actionData = useActionData<typeof action>();
-  const transition = useTransition();
+  const {} = useTypedLoaderData<typeof loader>();
+  const assignee = useMemo(() => {
+    // TODO: check if assignee is set to current user
+    return true;
+  }, []);
 
-  const isAdding =
-    transition.state === "submitting" &&
-    transition.submission.formData.get("_method") === "create_comment";
+  const isAuthor = false; // TODO - get author
 
-  const assignee = useMemo(
-    () => topic.assignees.find((assignee) => assignee.userId === userId),
-    [topic.assignees, userId]
-  );
-
-  const handleCreateAssignee = useCallback(
-    (id: Topic["id"]) => {
-      fetcher.submit(
-        { topic_id: id },
-        { action: "action/create-assignee", method: "post" }
-      );
-    },
-    [fetcher]
-  );
-
-  const handleDeleteAssignee = useCallback(
-    (id: Assignee["id"]) => {
-      fetcher.submit(
-        { assignee_id: id },
-        { action: "action/delete-assignee", method: "post" }
-      );
-    },
-    [fetcher]
-  );
+  const handleCreateAssignee = useCallback(() => {
+    // TODO: implement handleCreateAssignee function
+  }, []);
+  const handleDeleteAssignee = useCallback(() => {
+    // TODO: implement handleDeleteAssignee function
+  }, []);
 
   return (
     <div className="flex flex-col rounded-lg border border-slate-200 p-4 shadow-md">
-      <h3 className="text-2xl font-bold">{topic.title}</h3>
-      <p className="py-6">{topic.description}</p>
-
-      <p>Likes: {topic.likes.length}</p>
-
-      <p>
-        Assignes:{" "}
-        {topic.assignees.length === 0 ? (
-          <span>No assignees yet</span>
-        ) : (
-          topic.assignees.map((assignee) => assignee.user.email).join(", ")
-        )}
-      </p>
-
+      {/* TODO: list topic details here*/}
       <hr className="my-4" />
 
       <div className="flex gap-4">
@@ -120,11 +44,9 @@ export default function TopicDetailsPage() {
             "bg-purple-500 hover:bg-purple-600": assignee !== undefined,
             "bg-green-500 hover:bg-green-600": assignee === undefined,
           })}
-          onClick={() =>
-            assignee
-              ? handleDeleteAssignee(assignee.id)
-              : handleCreateAssignee(topic.id)
-          }
+          onClick={() => {
+            // TODO: implement onClick handler
+          }}
         >
           {assignee ? "Unassign" : "Assign myself"}
         </button>
@@ -145,18 +67,9 @@ export default function TopicDetailsPage() {
 
       <hr className="my-4" />
 
-      <div className="flex flex-col gap-4">
-        {topic.comments.length === 0 ? <p>No comments yet</p> : null}
-        {topic.comments.map((comment) => (
-          <Comment
-            key={comment.id}
-            author={comment.user.email}
-            content={comment.text}
-          />
-        ))}
-      </div>
+      <div className="flex flex-col gap-4">{/* TODO: list comments here*/}</div>
+      {/* TODO: add CommentForm*/}
       <hr className="my-4" />
-      <CommentForm error={actionData?.errors.comment} isAdding={isAdding} />
     </div>
   );
 }
