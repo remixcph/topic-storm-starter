@@ -37,9 +37,7 @@ export default function TopicIndexPage() {
         <p className="p-4">No topics yet</p>
       ) : (
         <>
-          {topics.map((topic) => {
-            return <TopicCard key={topic.id} topic={topic} userId={userId} />;
-          })}
+          {/* TODO: list topics using TopicCard */}
         </>
       )}
     </div>
