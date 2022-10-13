@@ -20,20 +20,8 @@ export async function loader({ request }: LoaderArgs) {
 
 export default function TopicIndexPage() {
   const { topics, userId } = useTypedLoaderData<typeof loader>();
-  const [, setSearchParams] = useSearchParams();
 
-  const handleSearch = React.useCallback(
-    (e: React.KeyboardEvent) => {
-      const target = e.target as HTMLInputElement;
-
-      if (target.value === "") {
-        setSearchParams({});
-      } else {
-        setSearchParams({ query: target.value });
-      }
-    },
-    [setSearchParams]
-  );
+  // TODO: add search input handler using useCallback and useSearchParams
 
   return (
     <div className="flex flex-col gap-6">
@@ -41,13 +29,7 @@ export default function TopicIndexPage() {
         {/* TODO: Add TopicForm component */}
       </div>
 
-      <input
-        className="w-full flex-1 rounded-lg border-2 border-slate-300 px-3 text-lg leading-loose"
-        placeholder="Search for a topic"
-        onKeyUp={(e) => handleSearch(e)}
-      />
-
-      
+      {/* TODO: add search inputfield */}
 
       <hr />
 
