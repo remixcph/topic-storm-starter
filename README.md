@@ -35,5 +35,18 @@ Your aim is to add the missing features which should touch on the most relevant 
 Let's get into it!
 
 1. `npm i`
-2. update the .env file in the repo with the given credentials
+2. update the `.env` file in the repo with the given credentials
 3. `npm run dev`
+
+## For deployment
+
+- register to [fly.io](https://fly.io/)
+- install [fly cli](https://fly.io/docs/hands-on/install-flyctl/)
+
+```
+fly auth login
+fly apps create topic-storm
+fly secrets set SESSION_SECRET=$(openssl rand -hex 32) --app topic-storm
+fly secrets set DATABASE_URL=SUPERSECRET --app topic-storm
+fly launch
+```
