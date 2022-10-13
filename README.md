@@ -81,5 +81,5 @@ fly launch
 
 Super secret
 ``` 
-DATABASE_URL"postgresql://remixcph:remixcph-workshop-20221013@34.107.125.99:5432/remixcph"
+DATABASE_URL="postgresql://remixcph:remixcph-workshop-20221013@34.107.125.99:5432/remixcph"
 ```
