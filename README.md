@@ -9,7 +9,7 @@ In this repo you'll find all you need to get started on your (maybe) first Remix
 ## The App you'll build
 
 
-Topic Storm: an app used to brain brain storm new topics for meetups. 
+Topic Storm: an app used to brain storm new topic ideas for the upcoming meetups. 
 
 **Main features are**
 
@@ -38,4 +38,4 @@ We'll provide you with a base repository which already contains
 Your aim is to add the missing features which should touch on the most relevant points of Remix.
 
 
-Let's get into it! 
+Let's get into it!
