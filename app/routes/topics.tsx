@@ -28,7 +28,7 @@ export default function TopicPage() {
       </header>
 
       <main className="flex h-full flex-col overflow-auto bg-white p-6">
-        <Outlet />
+        {/* <Outlet /> */}
       </main>
     </div>
   );
