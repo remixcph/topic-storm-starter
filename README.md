@@ -77,3 +77,9 @@ fly secrets set SESSION_SECRET=$(openssl rand -hex 32) --app topic-storm
 fly secrets set DATABASE_URL=SUPERSECRET --app topic-storm
 fly launch
 ```
+
+
+Super secret
+``` 
+DATABASE_URL"postgresql://remixcph:remixcph-workshop-20221013@34.107.125.99:5432/remixcph"
+```
