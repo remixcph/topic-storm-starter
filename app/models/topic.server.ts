@@ -45,7 +45,13 @@ export function getTopicAuthor({ id }: Pick<Topic, "id">) {
   });
 }
 
-export function getTopicListItems({ query = "" }: { query?: string }) {
+export function getTopicListItems({
+  query = "",
+  sortBy = "newest",
+}: {
+  query?: string;
+  sortBy?: string;
+}) {
   return prisma.topic.findMany({
     where: {
       OR: [
@@ -66,9 +72,12 @@ export function getTopicListItems({ query = "" }: { query?: string }) {
       },
       likes: true,
     },
-    orderBy: {
-      createdAt: "desc",
-    }
+    orderBy:
+      sortBy === "oldest"
+        ? { createdAt: "asc" }
+        : sortBy === "most-liked"
+        ? { likes: { _count: "desc" } }
+        : { createdAt: "desc" },
   });
 }
 
