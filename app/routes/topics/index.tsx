@@ -38,7 +38,7 @@ export default function TopicIndexPage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 shadow-md">
-        <TopicForm redirectTo="/topics" />
+        {/* TODO: Add TopicForm component */}
       </div>
 
       <input
