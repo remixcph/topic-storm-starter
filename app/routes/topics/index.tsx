@@ -10,11 +10,11 @@ import { TopicSorter } from "~/components/TopicSort";
 
 export async function loader({ request }: LoaderArgs) {
   const userId = await requireUserId(request);
-  const url = new URL(request.url);
-  const query = url.searchParams.get("query") || undefined;
-  const sortBy = url.searchParams.get("sort-topics") || undefined;
 
-  const topics = await getTopicListItems({ query, sortBy });
+  // TODO 2: get search params from request
+
+  // TODO 1: use getTopicListItems to fetch topics form DB
+  const topics = [];
   return typedjson({ topics, userId });
 }
 
@@ -36,9 +36,7 @@ export default function TopicIndexPage() {
       {topics.length === 0 ? (
         <p className="p-4">No topics yet</p>
       ) : (
-        <>
-          {/* TODO: list topics using TopicCard */}
-        </>
+        <>{/* TODO: list topics using TopicCard */}</>
       )}
     </div>
   );
